@@ -5,63 +5,104 @@ import { w3cwebsocket as W3CWebSocket } from "websocket";
 const socket = new W3CWebSocket('ws://127.0.0.1:8000/ws/video/');
 
 function Room() {
-    const [testTest, setTestTest] = useState(5);
-    const [playing, setPlaying] = useState(true);
+    const [playing, setPlaying] = useState(false);
+    const [currentTime, setCurrentTime] = useState(0);
     const player = useRef(null);
 
     useEffect(() => {
     socket.onopen = () => {
         console.log('WebSocket Client Connected');
       };
+
       socket.onclose = () => {
         console.log('WebSocket Closed!');
       };
+
       socket.onmessage = (message) => {
-        console.log('msg came........');
-        // setTestTest(testTest => testTest + 1);
-        // console.log(testTest);
-        const event = JSON.parse(message.data)['event']
-        if (event === 'pause') {
-            console.log('pause event');
-            setPlaying(false);
+        const data = JSON.parse(message.data)
+        if (data.event === 'pause') {
+            player.current.seekTo(data.currentTime);
+            setCurrentTime(data.currentTime);
+            if (player.current.props.playing !== false) {
+                setPlaying(false);
+            }
         }
-        if (event === 'play') {
-            console.log('play event');
-            setPlaying(true);
+        if (data.event === 'play') {
+            if (player.current.props.playing !== true) {
+                setPlaying(true);
+            }
+            setCurrentTime(data.currentTime);
         }
-    } 
+        if (data.event === 'progress') {
+            setCurrentTime(data.seconds)
+        }
+        if (data.event === 'syncAll') {
+            setCurrentTime(data.currentTime);
+            player.current.seekTo(data.currentTime);
+            if (player.current.props.playing !== true) {
+                setPlaying(true);
+            }
+        }
+    }
     }, [])
 
     const playerPlay = () => {
-        console.log('Play clicked');
         socket.send(JSON.stringify({
             'name': 'name',
             'event': 'play',
+            'currentTime': player.current.getCurrentTime()
         }));
-        // player.current.playing = true;
     }
 
     const playerPause = () => {
-        console.log('paused and sending data');
         socket.send(JSON.stringify({
             'name': 'name',
             'event': 'pause',
+            'currentTime': player.current.getCurrentTime()
         }));
     }
+
+    // const playerSeek = () => {
+    //     console.log('seeeeeek');
+    // }
+
+    // const playerStart = () => {
+    //     console.log('start');
+    // }
+
+    const playerReady = () => {
+        if (currentTime !== 0) {
+            player.current.seekTo(currentTime);
+            setPlaying(true);
+        }
+    }
+
+    // const playerProgress = ({ played, playedSeconds, loaded, loadedSeconds }) => {
+    //     socket.send(JSON.stringify({
+    //         'name': 'name',
+    //         'event': 'progress',
+    //         'seconds': playedSeconds
+    //     }));
+    // }
+
+    const playerSync = () => {
+        socket.send(JSON.stringify({
+            'name': 'name',
+            'event': 'syncAll',
+            'currentTime': player.current.getCurrentTime()
+        }));
+    };
 
 
     return (
         <div>
-            <ReactPlayer ref={player} url='https://media.w3.org/2010/05/sintel/trailer_hd.mp4' controls={true} 
-            // <ReactPlayer ref={player} url='C:\Users\sid84\Downloads\Java.mp4' controls={true} 
-            // onProgress={checkProgress} playing={pause} onPause={playerPause} onSeek={seeker} />
-            playing={playing} onPause={playerPause} onPlay={playerPlay} />
+            <ReactPlayer ref={player} url='https://www.youtube.com/watch?v=gR9xawiSy8A' controls={true} 
+            playing={playing} onPause={playerPause} /* onStart={playerStart} */ onPlay={playerPlay} /* onSeek={playerSeek} */ onReady={playerReady} /* onProgress={playerProgress} */ />
             <br />
-            {/* <button onClick={test}>{pause ? 'Pause' : 'Play'}</button>
-            <button onClick={rewind}>Rewind</button> */}
-            <button onClick={playerPlay}>Play</button>
+            <button onClick={playerSync}>Sync All</button>
             <br />
-            <span>{testTest}</span>
+            {/* <button onClick={test}>Pauseandsync</button> */}
+            <span>{playing}</span>
         </div>
     )
 }
