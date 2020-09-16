@@ -29,5 +29,5 @@ class VideoConsumer(AsyncWebsocketConsumer):
         )
 
     async def send_message(self, event):
-        print(f"incoming : {event['value']}")
+        # print(f"incoming : {event['value']}")
         await self.send(event['value'])
