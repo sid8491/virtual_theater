@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react'
 import ReactPlayer from 'react-player'
 import { w3cwebsocket as W3CWebSocket } from "websocket";
 
-const socket = new W3CWebSocket('ws://127.0.0.1:8000/ws/video/');
+const websocketUrl = `ws://127.0.0.1:8000/ws${window.location.pathname}/`
+const socket = new W3CWebSocket(websocketUrl);
 
 function Room() {
     const [playing, setPlaying] = useState(false);
@@ -126,16 +127,16 @@ function Room() {
             <button onClick={playerSync} className='btn btn-info btn-lg shadow p-2'>Sync Video</button>
             </div>
             <br /><br />
-            <div class="alert alert-info alert-dismissible fade show w-50" role="alert">
+            <div className="alert alert-info alert-dismissible fade show w-50" role="alert">
                 <strong> If video in the room is out of sync, you can click the "Sync Video" button to instantly sync video for all the users in the room! </strong>
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <button type="button" className="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="alert alert-info alert-dismissible fade show w-50" role="alert">
+            <div className="alert alert-info alert-dismissible fade show w-50" role="alert">
                 <strong> When we forward the video, it will forward it for all the users in the room but it pause the video as well. <br />
                 You need to play it again. </strong>
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <button type="button" className="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
