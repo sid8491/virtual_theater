@@ -51,6 +51,10 @@ function Room() {
             if (data.event === 'addVideo') {
                 setVideoUrl(data.videoUrl);
             }
+            return () => {
+                socket.close();
+                socket = null;
+            }
         }
     }, [])
 
