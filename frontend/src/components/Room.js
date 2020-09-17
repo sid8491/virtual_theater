@@ -2,50 +2,56 @@ import React, { useState, useRef, useEffect } from 'react'
 import ReactPlayer from 'react-player'
 import { w3cwebsocket as W3CWebSocket } from "websocket";
 
-const websocketUrl = `ws://127.0.0.1:8000/ws${window.location.pathname}/`
-const socket = new W3CWebSocket(websocketUrl);
+let socket;
 
 function Room() {
     const [playing, setPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [videoUrl, setVideoUrl] = useState('https://www.youtube.com/watch?v=gR9xawiSy8A')
     const player = useRef(null);
-
+    
     useEffect(() => {
-    socket.onopen = () => {
-        console.log('WebSocket Client Connected');
-      };
+        const websocketUrl = `ws://127.0.0.1:8000/ws${window.location.pathname}/`;
+        socket = new W3CWebSocket(websocketUrl);
+        
+        socket.onopen = () => {
+            console.log('WebSocket Client Connected');
+        };
 
-      socket.onclose = () => {
-        console.log('WebSocket Closed!');
-      };
+        socket.onclose = () => {
+            console.log('WebSocket Closed!');
+            };
 
-      socket.onmessage = (message) => {
-        const data = JSON.parse(message.data)
-        if (data.event === 'pause') {
-            player.current.seekTo(data.currentTime);
-            setCurrentTime(data.currentTime);
-            if (player.current.props.playing !== false) {
-                setPlaying(false);
+        socket.onmessage = (message) => {
+            const data = JSON.parse(message.data)
+            if (data.event === 'pause') {
+                player.current.seekTo(data.currentTime);
+                setCurrentTime(data.currentTime);
+                if (player.current.props.playing !== false) {
+                    setPlaying(false);
+                }
+            }
+            if (data.event === 'play') {
+                if (player.current.props.playing !== true) {
+                    setPlaying(true);
+                }
+                setCurrentTime(data.currentTime);
+            }
+            if (data.event === 'progress') {
+                setCurrentTime(data.seconds)
+            }
+            if (data.event === 'syncAll') {
+                setVideoUrl(data.videoUrl)
+                setCurrentTime(data.currentTime);
+                player.current.seekTo(data.currentTime);
+                if (player.current.props.playing !== true) {
+                    setPlaying(true);
+                }
+            }
+            if (data.event === 'addVideo') {
+                setVideoUrl(data.videoUrl);
             }
         }
-        if (data.event === 'play') {
-            if (player.current.props.playing !== true) {
-                setPlaying(true);
-            }
-            setCurrentTime(data.currentTime);
-        }
-        if (data.event === 'progress') {
-            setCurrentTime(data.seconds)
-        }
-        if (data.event === 'syncAll') {
-            setCurrentTime(data.currentTime);
-            player.current.seekTo(data.currentTime);
-            if (player.current.props.playing !== true) {
-                setPlaying(true);
-            }
-        }
-    }
     }, [])
 
     const playerPlay = () => {
@@ -91,15 +97,22 @@ function Room() {
         socket.send(JSON.stringify({
             'name': 'name',
             'event': 'syncAll',
+            'videoUrl': videoUrl,
             'currentTime': player.current.getCurrentTime()
         }));
     };
 
-    const addVideo = () => {
-        alert('addvideo');
-        
+    const addVideo = (e) => {
+        e.preventDefault();
+        if (document.querySelector('#videoUrl').value) {
+            socket.send(JSON.stringify({
+                'name': 'name',
+                'event': 'addVideo',
+                'videoUrl': document.querySelector('#videoUrl').value
+            }));
+        }
+        document.querySelector('#videoUrl').value = '';
     }
-
 
     return (
         <div className="container-fluid">
