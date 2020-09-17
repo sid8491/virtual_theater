@@ -7,13 +7,16 @@ let socket;
 function Room() {
     const [playing, setPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
-    const [videoUrl, setVideoUrl] = useState('https://www.youtube.com/watch?v=gR9xawiSy8A')
     const player = useRef(null);
-    
+
+    const storageVideoUrl = window.localStorage.getItem('video_url');
+    console.log(storageVideoUrl);
+    const [videoUrl, setVideoUrl] = useState(storageVideoUrl || 'https://www.youtube.com/watch?v=gR9xawiSy8A')
+
     useEffect(() => {
         const websocketUrl = `ws://127.0.0.1:8000/ws${window.location.pathname}/`;
         socket = new W3CWebSocket(websocketUrl);
-        
+
         socket.onopen = () => {
             console.log('WebSocket Client Connected');
         };
@@ -50,6 +53,7 @@ function Room() {
             }
             if (data.event === 'addVideo') {
                 setVideoUrl(data.videoUrl);
+                window.localStorage.setItem('video_url', data.videoUrl);
             }
             return () => {
                 socket.close();
@@ -127,7 +131,7 @@ function Room() {
                                 <input id='videoUrl' className="form-control form-control-lg" type="text" placeholder="Enter Video URL ..." />
                             </div>
                             <div className="col-4">
-                                <button className='btn btn-lg btn-primary mb-2' onClick={addVideo}>Add Video</button>
+                                <button className='btn btn-lg btn-info mb-2' onClick={addVideo}>Add Video</button>
                             </div>
                         </div>
                         <br />
@@ -140,10 +144,12 @@ function Room() {
                     </div>
             </div>
             <br />
-            <div className='w-50 text-center'>
-            <button onClick={playerSync} className='btn btn-info btn-lg shadow p-2'>Sync Video</button>
+            <div className='w-50 text-center btn-group btn-group-lg'>
+                <button onClick={playerSync} className='btn btn-info btn-lg shadow p-2 m-3'>Sync Video</button>
+                <button onClick={() => setPlaying(true)} className='btn btn-info btn-lg shadow p-2 m-3'>Play</button>
+                <button onClick={() => setPlaying(false)} className='btn btn-info btn-lg shadow p-2 m-3'>Pause</button>
             </div>
-            <br /><br />
+            <br />
             <div className="alert alert-info alert-dismissible fade show w-50" role="alert">
                 <strong> If video in the room is out of sync, you can click the "Sync Video" button to instantly sync video for all the users in the room! </strong>
                 <button type="button" className="close" data-dismiss="alert" aria-label="Close">
