@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import ReactPlayer from 'react-player'
 import { w3cwebsocket as W3CWebSocket } from "websocket";
+import Chatbar from './Chatbar'
 
 let socket;
 
@@ -138,30 +139,30 @@ function Room() {
                         <ReactPlayer height='50vh' width='100%' ref={player} url={videoUrl} controls={true} 
                             playing={playing} onPause={playerPause} /* onStart={playerStart} */ onPlay={playerPlay} /* onSeek={playerSeek} */ 
                             onReady={playerReady} /* onProgress={playerProgress} */ />
+                        <div className='w-100 text-center btn-group btn-group-lg'>
+                            <button onClick={playerSync} className='btn btn-info btn-lg shadow p-2 m-3'>Sync Video</button>
+                            <button onClick={() => setPlaying(true)} className='btn btn-info btn-lg shadow p-2 m-3'>Play</button>
+                            <button onClick={() => setPlaying(false)} className='btn btn-info btn-lg shadow p-2 m-3'>Pause</button>
+                        </div>
+                        <br />
+                        <div className="alert alert-info alert-dismissible fade show w-100" role="alert">
+                            <strong> If video in the room is out of sync, you can click the "Sync Video" button to instantly sync video for all the users in the room! </strong>
+                            <button type="button" className="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div className="alert alert-info alert-dismissible fade show w-100" role="alert">
+                            <strong> When we forward the video, it will forward it for all the users in the room but it pause the video as well. <br />
+                            You need to play it again. </strong>
+                            <button type="button" className="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
                     </div>
+
                     <div className="col-4">
-                        One of three columns
+                        <Chatbar />
                     </div>
-            </div>
-            <br />
-            <div className='w-50 text-center btn-group btn-group-lg'>
-                <button onClick={playerSync} className='btn btn-info btn-lg shadow p-2 m-3'>Sync Video</button>
-                <button onClick={() => setPlaying(true)} className='btn btn-info btn-lg shadow p-2 m-3'>Play</button>
-                <button onClick={() => setPlaying(false)} className='btn btn-info btn-lg shadow p-2 m-3'>Pause</button>
-            </div>
-            <br />
-            <div className="alert alert-info alert-dismissible fade show w-50" role="alert">
-                <strong> If video in the room is out of sync, you can click the "Sync Video" button to instantly sync video for all the users in the room! </strong>
-                <button type="button" className="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div className="alert alert-info alert-dismissible fade show w-50" role="alert">
-                <strong> When we forward the video, it will forward it for all the users in the room but it pause the video as well. <br />
-                You need to play it again. </strong>
-                <button type="button" className="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
             </div>
         </div>
     )
