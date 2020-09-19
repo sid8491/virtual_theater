@@ -1,25 +1,29 @@
-import React, { useState, useRef, useEffect } from 'react'
-import ReactPlayer from 'react-player'
+import React, { useState, useRef, useEffect } from 'react';
+import ReactPlayer from 'react-player';
 import { w3cwebsocket as W3CWebSocket } from "websocket";
-import Chatbar from './Chatbar'
+import Chatbar from './Chatbar';
+import { getName } from './Home';
 
 let socket;
 
-function Room() {
+function Room(props) {
     const [playing, setPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
+    const [userName, setUserName] = useState();
+    const [chat, setChat] = useState({});
     const player = useRef(null);
 
     const storageVideoUrl = window.localStorage.getItem('video_url');
-    console.log(storageVideoUrl);
     const [videoUrl, setVideoUrl] = useState(storageVideoUrl || 'https://www.youtube.com/watch?v=gR9xawiSy8A')
 
     useEffect(() => {
+        setUserName(props.location.state ? props.location.state.userName : getName());
         const websocketUrl = `ws://127.0.0.1:8000/ws${window.location.pathname}/`;
         socket = new W3CWebSocket(websocketUrl);
 
         socket.onopen = () => {
             console.log('WebSocket Client Connected');
+            setChat({from: userName, event: 'joined'})
         };
 
         socket.onclose = () => {
@@ -34,12 +38,14 @@ function Room() {
                 if (player.current.props.playing !== false) {
                     setPlaying(false);
                 }
+                setChat({from: data.name, event: 'paused'})
             }
             if (data.event === 'play') {
                 if (player.current.props.playing !== true) {
                     setPlaying(true);
                 }
                 setCurrentTime(data.currentTime);
+                setChat({from: data.name, event: 'played'})
             }
             if (data.event === 'progress') {
                 setCurrentTime(data.seconds)
@@ -51,10 +57,15 @@ function Room() {
                 if (player.current.props.playing !== true) {
                     setPlaying(true);
                 }
+                setChat({from: data.name, event: 'synced'})
             }
             if (data.event === 'addVideo') {
                 setVideoUrl(data.videoUrl);
                 window.localStorage.setItem('video_url', data.videoUrl);
+                setChat({from: data.name, event: 'added_video'})
+            }
+            if (data.event === 'addUserMessage') {
+                setChat({from: data.name, message: data.text})
             }
             return () => {
                 socket.close();
@@ -65,7 +76,7 @@ function Room() {
 
     const playerPlay = () => {
         socket.send(JSON.stringify({
-            'name': 'name',
+            'name': userName,
             'event': 'play',
             'currentTime': player.current.getCurrentTime()
         }));
@@ -73,7 +84,7 @@ function Room() {
 
     const playerPause = () => {
         socket.send(JSON.stringify({
-            'name': 'name',
+            'name': userName,
             'event': 'pause',
             'currentTime': player.current.getCurrentTime()
         }));
@@ -104,7 +115,7 @@ function Room() {
 
     const playerSync = () => {
         socket.send(JSON.stringify({
-            'name': 'name',
+            'name': userName,
             'event': 'syncAll',
             'videoUrl': videoUrl,
             'currentTime': player.current.getCurrentTime()
@@ -115,7 +126,7 @@ function Room() {
         e.preventDefault();
         if (document.querySelector('#videoUrl').value) {
             socket.send(JSON.stringify({
-                'name': 'name',
+                'name': userName,
                 'event': 'addVideo',
                 'videoUrl': document.querySelector('#videoUrl').value
             }));
@@ -161,7 +172,8 @@ function Room() {
                     </div>
 
                     <div className="col-4">
-                        <Chatbar />
+                        <span className='font-weight-light'>You are:</span> <span className='font-weight-bold'>{userName}</span>
+                        <Chatbar userName={userName} socket={socket} chatData={chat} />
                     </div>
             </div>
         </div>
