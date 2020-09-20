@@ -13,7 +13,7 @@ function Chatbar(props) {
         }
         document.querySelector('#inputText').value = '';
     };
-    
+
     const renderMessages = () => {
         const eventMapping = {
             'joined' : 'has joined the room!',
@@ -30,12 +30,10 @@ function Chatbar(props) {
             document.querySelector('#chat-log').innerHTML += `<div>${props.chatData.from} ${eventMapping[props.chatData.event]}</div><br />`
         }
     }
-                return (
-                    <div className="container shadow mt-3" style={{height: '100%', minHeight: '100%', position: 'relative'}}>
-            <h1>Chat</h1> <hr />
+
+    return (
+        <div className="container shadow mt-3" style={{height: '100%', minHeight: '100%', position: 'relative'}}>
             <div id="chat-log" className="col overflow-auto mb-2" style={{height: '75%', minHeight: '75%', maxHeight: '75%'}}>
-                Chat box <br />
-                {props.userName} <br />
                 {renderMessages()}
             </div>
             <div className="row w-100" style={{position: 'absolute', bottom: '10px'}}>

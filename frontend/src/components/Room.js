@@ -9,15 +9,15 @@ let socket;
 function Room(props) {
     const [playing, setPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
-    const [userName, setUserName] = useState();
+    const [userName, setUserName] = useState(props.location.state ? props.location.state.userName : getName());
     const [chat, setChat] = useState({});
+    const [sendEvent, setSendEvent] = useState(true);
     const player = useRef(null);
 
     const storageVideoUrl = window.localStorage.getItem('video_url');
     const [videoUrl, setVideoUrl] = useState(storageVideoUrl || 'https://www.youtube.com/watch?v=gR9xawiSy8A')
 
     useEffect(() => {
-        setUserName(props.location.state ? props.location.state.userName : getName());
         const websocketUrl = `ws://127.0.0.1:8000/ws${window.location.pathname}/`;
         socket = new W3CWebSocket(websocketUrl);
 
@@ -36,6 +36,7 @@ function Room(props) {
                 player.current.seekTo(data.currentTime);
                 setCurrentTime(data.currentTime);
                 if (player.current.props.playing !== false) {
+                    setSendEvent(false);
                     setPlaying(false);
                 }
                 setChat({from: data.name, event: 'paused'})
@@ -83,11 +84,14 @@ function Room(props) {
     }
 
     const playerPause = () => {
-        socket.send(JSON.stringify({
-            'name': userName,
-            'event': 'pause',
-            'currentTime': player.current.getCurrentTime()
-        }));
+        if (sendEvent == true) {
+            socket.send(JSON.stringify({
+                'name': userName,
+                'event': 'pause',
+                'currentTime': player.current.getCurrentTime()
+            }));
+        }
+        setSendEvent(true);
     }
 
     // const playerSeek = () => {
