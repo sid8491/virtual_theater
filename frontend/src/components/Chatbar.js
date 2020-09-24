@@ -32,16 +32,21 @@ function Chatbar(props) {
     }
 
     return (
-        <div className="container shadow mt-3" style={{height: '100%', minHeight: '100%', position: 'relative'}}>
-            <div id="chat-log" className="col overflow-auto mb-2" style={{height: '75%', minHeight: '75%', maxHeight: '75%'}}>
-                {renderMessages()}
+        <div className="container-fluid">
+            <div className="row">
+                <div className="col-12">
+                    <span className='font-weight-light'>You are:</span> <span className='font-weight-bold'>{props.userName}</span> <hr />
+                </div>
+                <div id="chat-log" className="col-12 overflow-auto" style={{height: '60vh'}}>
+                    {renderMessages()}
+                </div>
             </div>
-            <div className="row w-100" style={{position: 'absolute', bottom: '10px'}}>
+            <div className="row">
                 <div className="col-10">
-                    <textarea id='inputText' className="form-control form-control-lg" type="text" placeholder="Type here ..." />
+                    <textarea id='inputText' className="form-control form-control-lg my-2" type="text" placeholder="Type here ..." />
                 </div>
                 <div className="col-2">
-                    <button className='btn btn-lg btn-info mt-2 p-3' onClick={addMessage}>Send</button>
+                    <button className='btn btn-lg btn-info mt-4' onClick={addMessage}>Send</button>
                 </div>
             </div>
         </div>
