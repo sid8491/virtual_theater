@@ -23,7 +23,11 @@ function Room(props) {
 
         socket.onopen = () => {
             console.log('WebSocket Client Connected');
-            setChat({from: userName, event: 'joined'})
+            socket.send(JSON.stringify({
+                'name': userName,
+                'event': 'setChat',
+                'action': 'joined'
+            }));
         };
 
         socket.onclose = () => {
@@ -34,10 +38,7 @@ function Room(props) {
             const data = JSON.parse(message.data)
 
             if (data.event === 'pause') {
-                console.log(`pause event. I am ${userName}`);
-                console.log(data);
                 if (userName !== data.name) {
-                    console.log(`inside if by ${userName}`);
                     player.current.seekTo(data.currentTime);
                     setCurrentTime(data.currentTime);
                     setSendEvent(false);
@@ -47,10 +48,7 @@ function Room(props) {
             }
 
             if (data.event === 'play') {
-                console.log(`play event. I am ${userName}`);
-                console.log(data);
                 if (userName !== data.name) {
-                    console.log(`inside if by ${userName}`);
                     player.current.seekTo(data.currentTime);
                     setCurrentTime(data.currentTime);
                     setSendEvent(false);
@@ -60,8 +58,6 @@ function Room(props) {
             }
 
             if (data.event === 'syncAll') {
-                console.log(`syncAll event. I am ${userName}`);
-                console.log(data);
                 if (userName !== data.name) {
                     setVideoUrl(data.videoUrl);
                     player.current.seekTo(data.currentTime);
@@ -88,6 +84,10 @@ function Room(props) {
                 setChat({from: data.name, message: data.text})
             }
 
+            if (data.event === 'setChat') {
+                setChat({from: userName, event: 'joined'});
+            }
+
             return () => {
                 socket.close();
                 socket = null;
@@ -96,7 +96,6 @@ function Room(props) {
     }, []);
 
     const playerPause = () => {
-        console.log(`trying to pause by ${userName} with sendEvent: ${sendEvent}`);
         if (sendEvent === true) {
             socket.send(JSON.stringify({
                 'name': userName,
@@ -111,7 +110,6 @@ function Room(props) {
     }
 
     const playerPlay = () => {
-        console.log(`trying to play by ${userName} with sendEvent: ${sendEvent}`);
         if (sendEvent === true) {
             socket.send(JSON.stringify({
                 'name': userName,
@@ -126,7 +124,6 @@ function Room(props) {
     }
 
     const playerSync = () => {
-        console.log(`trying to sync by ${userName} with sendEvent: ${sendEvent}`);
         socket.send(JSON.stringify({
             'name': userName,
             'event': 'syncAll',
@@ -169,7 +166,7 @@ function Room(props) {
                             {
                                 (sendEvent)
                                 ? ``
-                                : <div class="spinner-grow text-danger ml-5" role="status"><span class="sr-only">Loading...</span></div>
+                                : <div className="spinner-grow text-danger ml-5" role="status"><span className="sr-only">Loading...</span></div>
                             }
                         </div>
                     </div>
@@ -210,48 +207,6 @@ function Room(props) {
             </div>
         </div>
     )
-    // return (
-    //     <div className="container-fluid">
-    //             <div className="row">
-    //                 <div className="col-8">
-    //                     <div className="row">
-    //                         <div className="col-8">
-    //                             <input id='videoUrl' className="form-control form-control-lg" type="text" placeholder="Enter Video URL ..." />
-    //                         </div>
-    //                         <div className="col-4">
-    //                             <button className='btn btn-lg btn-info mb-2' onClick={console.log('add video')}>Add Video</button>
-    //                         </div>
-    //                     </div>
-    //                     <br />
-    //                     <ReactPlayer height='50vh' width='100%' ref={player} url={videoUrl} controls={true}  />
-    //                     <div className='w-100 text-center btn-group btn-group-lg'>
-    //                         <button onClick={console.log('playerSync')} className='btn btn-info btn-lg shadow p-2 m-3'>Sync Video</button>
-    //                         <button onClick={() => setPlaying(true)} className='btn btn-info btn-lg shadow p-2 m-3'>Play</button>
-    //                         <button onClick={() => setPlaying(false)} className='btn btn-info btn-lg shadow p-2 m-3'>Pause</button>
-    //                     </div>
-    //                     <br />
-    //                     <div className="alert alert-info alert-dismissible fade show w-100" role="alert">
-    //                         <strong> If video in the room is out of sync, you can click the "Sync Video" button to instantly sync video for all the users in the room! </strong>
-    //                         <button type="button" className="close" data-dismiss="alert" aria-label="Close">
-    //                             <span aria-hidden="true">&times;</span>
-    //                         </button>
-    //                     </div>
-    //                     <div className="alert alert-info alert-dismissible fade show w-100" role="alert">
-    //                         <strong> When we forward the video, it will forward it for all the users in the room but it pause the video as well. <br />
-    //                         You need to play it again. </strong>
-    //                         <button type="button" className="close" data-dismiss="alert" aria-label="Close">
-    //                             <span aria-hidden="true">&times;</span>
-    //                         </button>
-    //                     </div>
-    //                 </div>
-
-    //                 <div className="col-4">
-    //                     <span className='font-weight-light'>You are:</span> <span className='font-weight-bold'>{userName}</span>
-    //                     <Chatbar userName={userName} socket={socket} chatData={chat} />
-    //                 </div>
-    //         </div>
-    //     </div>
-    // )
 }
 
 export default Room;

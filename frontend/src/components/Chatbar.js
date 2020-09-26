@@ -1,7 +1,6 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 function Chatbar(props) {
-    
     const addMessage = (e) => {
         e.preventDefault();
         if (document.querySelector('#inputText').value) {
@@ -22,16 +21,20 @@ function Chatbar(props) {
             'synced' : 'has synced all users in the room!',
             'addVideo': 'has added new video!'
         }
+        // if 
         if (props.chatData.message !== undefined) {
             // add message parsing here
             document.querySelector('#chat-log').innerHTML += `<div class="alert alert-info my-0">${props.chatData.from}: ${props.chatData.message}</div><br />`
             document.querySelector('#chat-log').scrollTop = document.querySelector('#chat-log').scrollHeight;
-        } else if (props.chatData.event !== undefined) {
-            // add events parsing here
-            document.querySelector('#chat-log').innerHTML += `<div class="alert alert-warning my-0">${props.chatData.from} ${eventMapping[props.chatData.event]}</div><br />`
-            document.querySelector('#chat-log').scrollTop = document.querySelector('#chat-log').scrollHeight;
         }
+        // } else if (props.chatData.event !== undefined) {
+        //     console.log('event');
+        //     // add events parsing here
+        //     document.querySelector('#chat-log').innerHTML += `<div class="alert alert-warning my-0">${props.chatData.from} ${eventMapping[props.chatData.event]}</div><br />`
+        //     document.querySelector('#chat-log').scrollTop = document.querySelector('#chat-log').scrollHeight;
+        // }
     }
+
     return (
         <div className="container-fluid">
             <div className="row">
