@@ -84,6 +84,10 @@ function Room(props) {
                 setCurrentTime(data.seconds)
             }
 
+            if (data.event === 'addUserMessage') {
+                setChat({from: data.name, message: data.text})
+            }
+
             return () => {
                 socket.close();
                 socket = null;
