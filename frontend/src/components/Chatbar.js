@@ -24,10 +24,12 @@ function Chatbar(props) {
         }
         if (props.chatData.message !== undefined) {
             // add message parsing here
-            document.querySelector('#chat-log').innerHTML += `<div>${props.chatData.from}: ${props.chatData.message}</div><br />`
+            document.querySelector('#chat-log').innerHTML += `<div class="alert alert-info my-0">${props.chatData.from}: ${props.chatData.message}</div><br />`
+            // return `${props.chatData.from}: ${props.chatData.message}`
         } else if (props.chatData.event !== undefined) {
             // add events parsing here
-            document.querySelector('#chat-log').innerHTML += `<div>${props.chatData.from} ${eventMapping[props.chatData.event]}</div><br />`
+            document.querySelector('#chat-log').innerHTML += `<div class="alert alert-warning my-0">${props.chatData.from} ${eventMapping[props.chatData.event]}</div><br />`
+            // return `${props.chatData.from} ${eventMapping[props.chatData.event]}`
         }
     }
 
@@ -39,6 +41,7 @@ function Chatbar(props) {
                 </div>
                 <div id="chat-log" className="col-12 overflow-auto" style={{height: '60vh'}}>
                     {renderMessages()}
+                    {/* <div className="alert alert-primary">{renderMessages()}</div> */}
                 </div>
             </div>
             <div className="row">

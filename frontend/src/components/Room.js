@@ -192,7 +192,7 @@ function Room(props) {
                         </div>
                         <div className="col-12">
                             <div className="alert alert-info alert-dismissible fade show w-100 shadow" role="alert">
-                                <strong> Do not perform any action if RED DOT is glowing, othewise it will not reflect in other users.</strong>
+                                <strong>Do not perform any action if RED DOT is glowing, othewise it will not reflect in other users.</strong>
                                 <button type="button" className="close" data-dismiss="alert" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
