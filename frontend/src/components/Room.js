@@ -186,7 +186,7 @@ function Room(props) {
                                 <button onClick={() => setPlaying(false)} className='btn btn-info btn-lg shadow p-2 mx-4'>Pause</button>
                             </div>
                         </div>
-                        <div className="col-12">
+                        <div className="col-12 d-none d-lg-block">
                             <div className="alert alert-info alert-dismissible fade show w-100 shadow" role="alert">
                                 <strong> If video in the room is out of sync, you can click the "Sync Video" button to instantly sync video for all the users in the room! </strong>
                                 <button type="button" className="close" data-dismiss="alert" aria-label="Close">
@@ -194,7 +194,7 @@ function Room(props) {
                                 </button>
                             </div>
                         </div>
-                        <div className="col-12">
+                        <div className="col-12 d-none d-lg-block">
                             <div className="alert alert-info alert-dismissible fade show w-100 shadow" role="alert">
                                 <strong>Do not perform any action if RED DOT is glowing, othewise it will not reflect in other users.</strong>
                                 <button type="button" className="close" data-dismiss="alert" aria-label="Close">
