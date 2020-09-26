@@ -1,7 +1,7 @@
 import React from 'react'
 
 function Chatbar(props) {
-
+    
     const addMessage = (e) => {
         e.preventDefault();
         if (document.querySelector('#inputText').value) {
@@ -25,23 +25,21 @@ function Chatbar(props) {
         if (props.chatData.message !== undefined) {
             // add message parsing here
             document.querySelector('#chat-log').innerHTML += `<div class="alert alert-info my-0">${props.chatData.from}: ${props.chatData.message}</div><br />`
-            // return `${props.chatData.from}: ${props.chatData.message}`
+            document.querySelector('#chat-log').scrollTop = document.querySelector('#chat-log').scrollHeight;
         } else if (props.chatData.event !== undefined) {
             // add events parsing here
             document.querySelector('#chat-log').innerHTML += `<div class="alert alert-warning my-0">${props.chatData.from} ${eventMapping[props.chatData.event]}</div><br />`
-            // return `${props.chatData.from} ${eventMapping[props.chatData.event]}`
+            document.querySelector('#chat-log').scrollTop = document.querySelector('#chat-log').scrollHeight;
         }
     }
-
     return (
         <div className="container-fluid">
             <div className="row">
                 <div className="col-12">
                     <span className='font-weight-light'>You are:</span> <span className='font-weight-bold'>{props.userName}</span> <hr />
                 </div>
-                <div id="chat-log" className="col-12 overflow-auto" style={{height: '60vh'}}>
+                <div id="chat-log" className="col-12 overflow-auto scrollbar scrollbar-indigo bordered-indigo thin" style={{height: '60vh', overflowY:'scroll'}}>
                     {renderMessages()}
-                    {/* <div className="alert alert-primary">{renderMessages()}</div> */}
                 </div>
             </div>
             <div className="row">
