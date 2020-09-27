@@ -15,7 +15,7 @@ function Room(props) {
     const player = useRef(null);
 
     const storageVideoUrl = window.localStorage.getItem('video_url');
-    const [videoUrl, setVideoUrl] = useState(storageVideoUrl || 'https://www.youtube.com/watch?v=gR9xawiSy8A');
+    const [videoUrl, setVideoUrl] = useState(storageVideoUrl || 'https://www.youtube.com/watch?v=TcMBFSGVi1c');
 
     useEffect(() => {
         const websocketUrl = `ws://127.0.0.1:8000/ws${window.location.pathname}/`;
@@ -58,7 +58,6 @@ function Room(props) {
             }
 
             if (data.event === 'syncAll') {
-                if (userName !== data.name) {
                     setVideoUrl(data.videoUrl);
                     player.current.seekTo(data.currentTime);
                     setCurrentTime(data.currentTime);
@@ -66,8 +65,7 @@ function Room(props) {
                         setSendEvent(false);
                         setPlaying(true);
                     }
-                }
-                setChat({from: data.name, event: 'synced'})
+                setChat({from: data.name, event: 'synced'});
             }
 
             if (data.event === 'addVideo') {
@@ -96,6 +94,7 @@ function Room(props) {
     }, []);
 
     const playerPause = () => {
+        setPlaying(false);
         if (sendEvent === true) {
             socket.send(JSON.stringify({
                 'name': userName,
@@ -110,6 +109,7 @@ function Room(props) {
     }
 
     const playerPlay = () => {
+        setPlaying(true);
         if (sendEvent === true) {
             socket.send(JSON.stringify({
                 'name': userName,
